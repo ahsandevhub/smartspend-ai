@@ -254,305 +254,310 @@ export default function Home() {
       <AnimatePresence>
         {selectedNote && (
           <>
-            {/* Backdrop - unchanged */}
+            {/* Enhanced Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/30 backdrop-blur-lg z-40"
               onClick={() => setSelectedNote(null)}
             />
 
-            {/* Modal */}
+            {/* Modal with Grid Pattern */}
             <motion.div
               initial={{ opacity: 0, y: 20, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:w-[95vw] sm:max-w-6xl sm:h-[90vh] h-screen bg-purple-600/20 backdrop-blur-sm sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+              className="fixed inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:w-[95vw] sm:max-w-6xl sm:h-[80vh] h-screen bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:24px_24px] bg-gray-50 sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             >
-              {/* Header - unchanged */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 md:p-5 px-5 py-3 text-white">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h2 className="text-2xl font-bold">Financial Insights</h2>
-                    <p className="text-indigo-100 text-sm mt-1">
-                      Analysis of your transaction
+              {/* Content container */}
+              <div className="relative z-10 flex flex-col h-full">
+                {/* Header */}
+                <div className="bg-gradient-to-r from-purple-600/90 to-indigo-600/90 p-5 text-white border-b border-white/10">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h2 className="text-2xl font-bold">Financial Insights</h2>
+                      <p className="text-purple-100 text-sm mt-1">
+                        Analysis of your transaction
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setSelectedNote(null)}
+                      className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto sm:p-6 p-4">
+                  {/* Original Note Card - always visible */}
+                  <div className="bg-purple-50 rounded-xl md:p-5 p-4 mb-6 border border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
+                      <h3 className="font-medium text-gray-800">
+                        Original Transaction
+                      </h3>
+                    </div>
+                    <p className="text-gray-600 border border-gray-200 whitespace-pre-wrap bg-white p-4 rounded-lg">
+                      {selectedNote.text}
                     </p>
                   </div>
-                  <button
-                    onClick={() => setSelectedNote(null)}
-                    className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
-                  >
-                    <X className="h-8 w-8" />
-                  </button>
-                </div>
-              </div>
 
-              {/* Content */}
-              <div className="flex-1 overflow-y-auto sm:p-6 p-4">
-                {/* Original Note Card - always visible */}
-                <div className="bg-purple-50 rounded-xl md:p-5 p-4 mb-6 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
-                    <h3 className="font-medium text-gray-800">
-                      Original Transaction
-                    </h3>
-                  </div>
-                  <p className="text-gray-600 border border-gray-200 whitespace-pre-wrap bg-white p-4 rounded-lg">
-                    {selectedNote.text}
-                  </p>
-                </div>
+                  {isAnalyzing ? (
+                    // Loading Skeleton UI
+                    <div className="space-y-8">
+                      {/* Financial Summary Skeleton */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {[...Array(3)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="p-5 rounded-xl border border-gray-200"
+                          >
+                            <div className="h-4 w-1/3 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                            <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                          </div>
+                        ))}
+                      </div>
 
-                {isAnalyzing ? (
-                  // Loading Skeleton UI
-                  <div className="space-y-8">
-                    {/* Financial Summary Skeleton */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      {[...Array(3)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="p-5 rounded-xl border border-gray-200"
-                        >
-                          <div className="h-4 w-1/3 bg-gray-200 rounded mb-2 animate-pulse"></div>
-                          <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse"></div>
-                        </div>
-                      ))}
-                    </div>
+                      {/* Charts Skeleton */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {[...Array(2)].map((_, i) => (
+                          <div
+                            key={i}
+                            className="p-5 rounded-xl border border-gray-200"
+                          >
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                              <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                            <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+                          </div>
+                        ))}
+                      </div>
 
-                    {/* Charts Skeleton */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {[...Array(2)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="p-5 rounded-xl border border-gray-200"
-                        >
+                      {/* Trends & Advice Skeleton */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="p-5 rounded-xl border border-gray-200">
                           <div className="flex items-center gap-2 mb-4">
                             <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                             <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
                           </div>
-                          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+                          <div className="space-y-3">
+                            {[...Array(3)].map((_, i) => (
+                              <div key={i} className="flex items-start gap-3">
+                                <div className="w-6 h-6 rounded-full bg-gray-200 mt-0.5"></div>
+                                <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      ))}
+                        <div className="p-5 rounded-xl border border-gray-200 bg-gray-100">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                            <div className="h-4 w-1/4 bg-gray-300 rounded animate-pulse"></div>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="h-4 w-full bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-5/6 bg-gray-300 rounded animate-pulse"></div>
+                            <div className="h-4 w-2/3 bg-gray-300 rounded animate-pulse"></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-
-                    {/* Trends & Advice Skeleton */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <div className="p-5 rounded-xl border border-gray-200">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                          <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
-                        </div>
-                        <div className="space-y-3">
-                          {[...Array(3)].map((_, i) => (
-                            <div key={i} className="flex items-start gap-3">
-                              <div className="w-6 h-6 rounded-full bg-gray-200 mt-0.5"></div>
-                              <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                  ) : (
+                    // Actual Content when not loading
+                    <>
+                      {/* Financial Summary */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                        {/* Income Card */}
+                        <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border-2 border-green-200 relative overflow-hidden">
+                          <div className="absolute -right-4 -top-4 text-green-200 opacity-30">
+                            <Wallet className="h-24 w-24" />
+                          </div>
+                          <div className="flex items-center gap-3 z-10 relative">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              <ArrowDownCircle
+                                className="h-5 w-5 text-green-600"
+                                fill="currentColor"
+                              />
                             </div>
-                          ))}
+                            <div>
+                              <p className="text-sm text-green-600 mb-1">
+                                Total Income
+                              </p>
+                              <p className="text-3xl font-bold text-green-700">
+                                ৳
+                                {selectedNote.analysis?.totalEarnings?.toLocaleString() ||
+                                  0}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Expenses Card */}
+                        <div className="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-xl border-2 border-red-200 relative overflow-hidden">
+                          <div className="absolute -right-4 -top-4 text-red-200 opacity-30">
+                            <ShoppingCart className="h-24 w-24" />
+                          </div>
+                          <div className="flex items-center gap-3 z-10 relative">
+                            <div className="p-2 bg-red-100 rounded-lg">
+                              <ArrowUpCircle
+                                className="h-5 w-5 text-red-600"
+                                fill="currentColor"
+                              />
+                            </div>
+                            <div>
+                              <p className="text-sm text-red-600 mb-1">
+                                Total Expenses
+                              </p>
+                              <p className="text-3xl font-bold text-red-700">
+                                ৳
+                                {selectedNote.analysis?.totalExpenses?.toLocaleString() ||
+                                  0}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Balance Card */}
+                        <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border-2 border-blue-200 relative overflow-hidden">
+                          <div className="absolute -right-4 -top-4 text-blue-200 opacity-30">
+                            <PiggyBank className="h-24 w-24" />
+                          </div>
+                          <div className="flex items-center gap-3 z-10 relative">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              <Scale className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <p className="text-sm text-blue-600 mb-1">
+                                Current Balance
+                              </p>
+                              <p className="text-3xl font-bold text-blue-700">
+                                ৳
+                                {selectedNote.analysis?.netSavings?.toLocaleString() ||
+                                  0}
+                              </p>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                      <div className="p-5 rounded-xl border border-gray-200 bg-gray-100">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-3 h-3 rounded-full bg-gray-400"></div>
-                          <div className="h-4 w-1/4 bg-gray-300 rounded animate-pulse"></div>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="h-4 w-full bg-gray-300 rounded animate-pulse"></div>
-                          <div className="h-4 w-5/6 bg-gray-300 rounded animate-pulse"></div>
-                          <div className="h-4 w-2/3 bg-gray-300 rounded animate-pulse"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  // Actual Content when not loading
-                  <>
-                    {/* Financial Summary */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                      {/* Income Card */}
-                      <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border-2 border-green-200 relative overflow-hidden">
-                        <div className="absolute -right-4 -top-4 text-green-200 opacity-30">
-                          <Wallet className="h-24 w-24" />
-                        </div>
-                        <div className="flex items-center gap-3 z-10 relative">
-                          <div className="p-2 bg-green-100 rounded-lg">
-                            <ArrowDownCircle
-                              className="h-5 w-5 text-green-600"
-                              fill="currentColor"
+                      {/* Charts Row */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div className="bg-green-50 p-5 rounded-xl border border-gray-200 shadow-sm">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                            <h3 className="font-medium text-gray-800">
+                              Income Sources
+                            </h3>
+                          </div>
+                          <div className="h-64 flex items-center justify-center">
+                            <IncomeChart
+                              sources={
+                                selectedNote.analysis?.incomeSources || {}
+                              }
                             />
                           </div>
-                          <div>
-                            <p className="text-sm text-green-600 mb-1">
-                              Total Income
-                            </p>
-                            <p className="text-3xl font-bold text-green-700">
-                              ৳
-                              {selectedNote.analysis?.totalEarnings?.toLocaleString() ||
-                                0}
-                            </p>
+                        </div>
+                        <div className="bg-red-50 p-5 rounded-xl border border-gray-200 shadow-sm">
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                            <h3 className="font-medium text-gray-800">
+                              Expense Breakdown
+                            </h3>
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Expenses Card */}
-                      <div className="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-xl border-2 border-red-200 relative overflow-hidden">
-                        <div className="absolute -right-4 -top-4 text-red-200 opacity-30">
-                          <ShoppingCart className="h-24 w-24" />
-                        </div>
-                        <div className="flex items-center gap-3 z-10 relative">
-                          <div className="p-2 bg-red-100 rounded-lg">
-                            <ArrowUpCircle
-                              className="h-5 w-5 text-red-600"
-                              fill="currentColor"
+                          <div className="h-64 flex items-center justify-center">
+                            <ExpenseChart
+                              categories={
+                                selectedNote.analysis?.expenseCategories || {}
+                              }
                             />
                           </div>
-                          <div>
-                            <p className="text-sm text-red-600 mb-1">
-                              Total Expenses
-                            </p>
-                            <p className="text-3xl font-bold text-red-700">
-                              ৳
-                              {selectedNote.analysis?.totalExpenses?.toLocaleString() ||
-                                0}
-                            </p>
-                          </div>
                         </div>
                       </div>
 
-                      {/* Balance Card */}
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border-2 border-blue-200 relative overflow-hidden">
-                        <div className="absolute -right-4 -top-4 text-blue-200 opacity-30">
-                          <PiggyBank className="h-24 w-24" />
-                        </div>
-                        <div className="flex items-center gap-3 z-10 relative">
-                          <div className="p-2 bg-blue-100 rounded-lg">
-                            <Scale className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm text-blue-600 mb-1">
-                              Current Balance
-                            </p>
-                            <p className="text-3xl font-bold text-blue-700">
-                              ৳
-                              {selectedNote.analysis?.netSavings?.toLocaleString() ||
-                                0}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Charts Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                      <div className="bg-green-50 p-5 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                          <h3 className="font-medium text-gray-800">
-                            Income Sources
-                          </h3>
-                        </div>
-                        <div className="h-64 flex items-center justify-center">
-                          <IncomeChart
-                            sources={selectedNote.analysis?.incomeSources || {}}
-                          />
-                        </div>
-                      </div>
-                      <div className="bg-red-50 p-5 rounded-xl border border-gray-200 shadow-sm">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                          <h3 className="font-medium text-gray-800">
-                            Expense Breakdown
-                          </h3>
-                        </div>
-                        <div className="h-64 flex items-center justify-center">
-                          <ExpenseChart
-                            categories={
-                              selectedNote.analysis?.expenseCategories || {}
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Trends & Advice */}
-                    {selectedNote.analysis && (
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {selectedNote.analysis.trends && (
-                          <div className="bg-purple-50 p-5 rounded-xl border border-gray-200 shadow-sm">
-                            <div className="flex items-center gap-2 mb-4">
-                              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
-                              <h3 className="font-medium text-gray-800">
-                                Key Trends
-                              </h3>
-                            </div>
-                            <ul className="space-y-3">
-                              {selectedNote.analysis.trends.map(
-                                (trend, index) => (
-                                  <li
-                                    key={index}
-                                    className="flex items-start gap-3"
-                                  >
-                                    <span
-                                      className={`inline-flex items-center justify-center w-6 h-6 rounded-full mt-0.5 flex-shrink-0 ${
-                                        trend.toLowerCase().includes("income")
-                                          ? "bg-green-100 text-green-800"
-                                          : "bg-red-100 text-red-800"
-                                      }`}
+                      {/* Trends & Advice */}
+                      {selectedNote.analysis && (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {selectedNote.analysis.trends && (
+                            <div className="bg-purple-50 p-5 rounded-xl border border-gray-200 shadow-sm">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                                <h3 className="font-medium text-gray-800">
+                                  Key Trends
+                                </h3>
+                              </div>
+                              <ul className="space-y-3">
+                                {selectedNote.analysis.trends.map(
+                                  (trend, index) => (
+                                    <li
+                                      key={index}
+                                      className="flex items-start gap-3"
                                     >
-                                      {trend.toLowerCase().includes("income")
-                                        ? "↑"
-                                        : "↓"}
-                                    </span>
-                                    <p className="text-gray-700">{trend}</p>
-                                  </li>
-                                )
-                              )}
-                            </ul>
-                          </div>
-                        )}
-
-                        {selectedNote.analysis.advice && (
-                          <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-xl border border-amber-200">
-                            <div className="flex items-center gap-2 mb-4">
-                              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
-                              <h3 className="font-medium text-gray-800">
-                                Smart Advice
-                              </h3>
+                                      <span
+                                        className={`inline-flex items-center justify-center w-6 h-6 rounded-full mt-0.5 flex-shrink-0 ${
+                                          trend.toLowerCase().includes("income")
+                                            ? "bg-green-100 text-green-800"
+                                            : "bg-red-100 text-red-800"
+                                        }`}
+                                      >
+                                        {trend.toLowerCase().includes("income")
+                                          ? "↑"
+                                          : "↓"}
+                                      </span>
+                                      <p className="text-gray-700">{trend}</p>
+                                    </li>
+                                  )
+                                )}
+                              </ul>
                             </div>
-                            <div className="prose prose-sm text-gray-700">
-                              {selectedNote.analysis.advice}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+                          )}
 
-              {/* Footer - Redesigned */}
-              <div className="border-t border-gray-200/50 p-4 bg-gradient-to-r from-purple-50 via-gray-50 to-white">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center space-x-1 text-sm text-gray-500">
-                    <Clock className="h-4 w-4 text-indigo-400" />
-                    <span>
-                      Last analyzed:{" "}
-                      {new Date().toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
+                          {selectedNote.analysis.advice && (
+                            <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-xl border border-amber-200">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                                <h3 className="font-medium text-gray-800">
+                                  Smart Advice
+                                </h3>
+                              </div>
+                              <div className="prose prose-sm text-gray-700">
+                                {selectedNote.analysis.advice}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+
+                {/* Footer - Redesigned */}
+                <div className="border-t border-gray-200/50 p-4 bg-gradient-to-r from-purple-50 via-gray-50 to-white">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-1 text-sm text-gray-500">
+                      <Clock className="h-4 w-4 text-indigo-400" />
+                      <span>
+                        Last analyzed:{" "}
+                        {new Date().toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setSelectedNote(null)}
+                      className="group relative px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-sm hover:shadow-md"
+                    >
+                      <span className="relative z-10 flex items-center">
+                        <CheckCircle className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
+                        Done
+                      </span>
+                      <span className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                    </button>
                   </div>
-                  <button
-                    onClick={() => setSelectedNote(null)}
-                    className="group relative px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-sm hover:shadow-md"
-                  >
-                    <span className="relative z-10 flex items-center">
-                      <CheckCircle className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
-                      Done
-                    </span>
-                    <span className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></span>
-                  </button>
                 </div>
               </div>
             </motion.div>
