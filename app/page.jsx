@@ -274,10 +274,12 @@ export default function Home() {
               {/* Content container */}
               <div className="relative z-10 flex flex-col h-full">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-purple-600/90 to-indigo-600/90 md:p-5 px-5 py-2 text-white border-b border-white/10">
+                <div className="bg-gradient-to-r from-purple-600/90 to-indigo-600/90 md:p-5 px-5 py-3 text-white border-b border-white/10">
                   <div className="flex justify-between items-center">
                     <div>
-                      <h2 className="text-2xl font-bold">Financial Insights</h2>
+                      <h2 className="text-2xl font-bold mb-1">
+                        Financial Insights
+                      </h2>
                       <p className="text-purple-100 text-sm">
                         Analysis of your transaction
                       </p>
