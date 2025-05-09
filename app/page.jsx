@@ -1,7 +1,19 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Plus, X } from "lucide-react";
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  CheckCircle,
+  Clock,
+  Loader2,
+  PiggyBank,
+  Plus,
+  Scale,
+  ShoppingCart,
+  Wallet,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import AddNoteModal from "../components/AddNoteModal";
 import { ExpenseChart, IncomeChart } from "../components/Charts";
@@ -143,7 +155,7 @@ export default function Home() {
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
         <main className="flex-grow container mx-auto p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {[...Array(6)].map((_, i) => (
               <CardSkeleton key={i} />
             ))}
@@ -158,7 +170,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header setIsModalOpen={setIsModalOpen} />
 
-      <main className="flex-grow container mx-auto px-4 md:px-6 py-6 max-w-7xl">
+      <main className="flex-grow container mx-auto px-3 md:px-6 py-5 max-w-7xl">
         {notes.length === 0 ? (
           <div className="text-center py-12 md:py-20">
             <div className="mx-auto w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
@@ -179,7 +191,7 @@ export default function Home() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
             <AnimatePresence>
               {notes.map((note) => (
                 <motion.div
@@ -188,6 +200,7 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
+                  className="h-full"
                 >
                   <NoteCard
                     note={note}
@@ -224,7 +237,7 @@ export default function Home() {
               className="fixed inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:w-[95vw] sm:max-w-6xl sm:h-[90vh] h-screen bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             >
               {/* Header - unchanged */}
-              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white">
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 md:p-5 px-5 py-3 text-white">
                 <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-2xl font-bold">Financial Insights</h2>
@@ -236,7 +249,7 @@ export default function Home() {
                     onClick={() => setSelectedNote(null)}
                     className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
                   >
-                    <X className="h-5 w-5" />
+                    <X className="h-8 w-8" />
                   </button>
                 </div>
               </div>
@@ -244,14 +257,14 @@ export default function Home() {
               {/* Content */}
               <div className="flex-1 overflow-y-auto sm:p-6 p-4">
                 {/* Original Note Card - always visible */}
-                <div className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200">
+                <div className="bg-purple-50 rounded-xl md:p-5 p-4 mb-6 border border-gray-200">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
                     <h3 className="font-medium text-gray-800">
                       Original Transaction
                     </h3>
                   </div>
-                  <p className="text-gray-600 whitespace-pre-wrap bg-white p-4 rounded-lg">
+                  <p className="text-gray-600 border border-gray-200 whitespace-pre-wrap bg-white p-4 rounded-lg">
                     {selectedNote.text}
                   </p>
                 </div>
@@ -322,41 +335,81 @@ export default function Home() {
                   <>
                     {/* Financial Summary */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                      <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-100">
-                        <p className="text-sm text-green-600 mb-1">
-                          Total Income
-                        </p>
-                        <p className="text-3xl font-bold text-green-700">
-                          ৳
-                          {selectedNote.analysis?.totalEarnings?.toLocaleString() ||
-                            0}
-                        </p>
+                      {/* Income Card */}
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border-2 border-green-200 relative overflow-hidden">
+                        <div className="absolute -right-4 -top-4 text-green-200 opacity-30">
+                          <Wallet className="h-24 w-24" />
+                        </div>
+                        <div className="flex items-center gap-3 z-10 relative">
+                          <div className="p-2 bg-green-100 rounded-lg">
+                            <ArrowDownCircle
+                              className="h-5 w-5 text-green-600"
+                              fill="currentColor"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm text-green-600 mb-1">
+                              Total Income
+                            </p>
+                            <p className="text-3xl font-bold text-green-700">
+                              ৳
+                              {selectedNote.analysis?.totalEarnings?.toLocaleString() ||
+                                0}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-xl border border-red-100">
-                        <p className="text-sm text-red-600 mb-1">
-                          Total Expenses
-                        </p>
-                        <p className="text-3xl font-bold text-red-700">
-                          ৳
-                          {selectedNote.analysis?.totalExpenses?.toLocaleString() ||
-                            0}
-                        </p>
+
+                      {/* Expenses Card */}
+                      <div className="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-xl border-2 border-red-200 relative overflow-hidden">
+                        <div className="absolute -right-4 -top-4 text-red-200 opacity-30">
+                          <ShoppingCart className="h-24 w-24" />
+                        </div>
+                        <div className="flex items-center gap-3 z-10 relative">
+                          <div className="p-2 bg-red-100 rounded-lg">
+                            <ArrowUpCircle
+                              className="h-5 w-5 text-red-600"
+                              fill="currentColor"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-sm text-red-600 mb-1">
+                              Total Expenses
+                            </p>
+                            <p className="text-3xl font-bold text-red-700">
+                              ৳
+                              {selectedNote.analysis?.totalExpenses?.toLocaleString() ||
+                                0}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-100">
-                        <p className="text-sm text-blue-600 mb-1">
-                          Current Balance
-                        </p>
-                        <p className="text-3xl font-bold text-blue-700">
-                          ৳
-                          {selectedNote.analysis?.netSavings?.toLocaleString() ||
-                            0}
-                        </p>
+
+                      {/* Balance Card */}
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border-2 border-blue-200 relative overflow-hidden">
+                        <div className="absolute -right-4 -top-4 text-blue-200 opacity-30">
+                          <PiggyBank className="h-24 w-24" />
+                        </div>
+                        <div className="flex items-center gap-3 z-10 relative">
+                          <div className="p-2 bg-blue-100 rounded-lg">
+                            <Scale className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-blue-600 mb-1">
+                              Current Balance
+                            </p>
+                            <p className="text-3xl font-bold text-blue-700">
+                              ৳
+                              {selectedNote.analysis?.netSavings?.toLocaleString() ||
+                                0}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
-
                     {/* Charts Row */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                      <div className="bg-green-50 p-5 rounded-xl border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="w-3 h-3 rounded-full bg-green-500"></div>
                           <h3 className="font-medium text-gray-800">
@@ -369,7 +422,7 @@ export default function Home() {
                           />
                         </div>
                       </div>
-                      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                      <div className="bg-red-50 p-5 rounded-xl border border-gray-200 shadow-sm">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="w-3 h-3 rounded-full bg-red-500"></div>
                           <h3 className="font-medium text-gray-800">
@@ -390,7 +443,7 @@ export default function Home() {
                     {selectedNote.analysis && (
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {selectedNote.analysis.trends && (
-                          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                          <div className="bg-purple-50 p-5 rounded-xl border border-gray-200 shadow-sm">
                             <div className="flex items-center gap-2 mb-4">
                               <div className="w-3 h-3 rounded-full bg-purple-500"></div>
                               <h3 className="font-medium text-gray-800">
@@ -442,16 +495,30 @@ export default function Home() {
                 )}
               </div>
 
-              {/* Footer - unchanged */}
-              <div className="border-t border-gray-200 p-4 bg-gray-50 flex justify-end">
-                <button
-                  onClick={() => {
-                    setSelectedNote(null);
-                  }}
-                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors shadow-sm"
-                >
-                  Done
-                </button>
+              {/* Footer - Redesigned */}
+              <div className="border-t border-gray-200/50 p-4 bg-gradient-to-r from-white via-gray-50 to-white">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-1 text-sm text-gray-500">
+                    <Clock className="h-4 w-4 text-indigo-400" />
+                    <span>
+                      Last analyzed:{" "}
+                      {new Date().toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedNote(null)}
+                    className="group relative px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-lg font-medium transition-all shadow-sm hover:shadow-md"
+                  >
+                    <span className="relative z-10 flex items-center">
+                      <CheckCircle className="h-5 w-5 mr-2 transition-transform group-hover:scale-110" />
+                      Done
+                    </span>
+                    <span className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-purple-700 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                  </button>
+                </div>
               </div>
             </motion.div>
           </>
