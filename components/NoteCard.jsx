@@ -72,7 +72,13 @@ export const NoteCard = ({ note, onDelete, onAnalyze, onEdit }) => {
 
         <div className="flex space-x-2">
           <button
-            onClick={() => onAnalyze(note)}
+            onClick={() => {
+              try {
+                onAnalyze(note);
+              } catch (error) {
+                console.error("Analysis error:", error);
+              }
+            }}
             className="p-2 text-indigo-500 hover:text-indigo-700 rounded-full hover:bg-indigo-100"
             title="Analyze"
           >
@@ -93,7 +99,7 @@ export const NoteCard = ({ note, onDelete, onAnalyze, onEdit }) => {
           <div className="pt-2 border-t border-gray-200">
             <div className="flex justify-between text-xs mb-1">
               <span>Income</span>
-              <span>${note.analysis.totalEarnings || 0}</span>
+              <span>৳{note.analysis.totalEarnings || 0}</span>
             </div>
             <ProgressBar
               value={note.analysis.totalEarnings}
@@ -103,7 +109,7 @@ export const NoteCard = ({ note, onDelete, onAnalyze, onEdit }) => {
 
             <div className="flex justify-between text-xs mt-3 mb-1">
               <span>Expenses</span>
-              <span>${note.analysis.totalExpenses || 0}</span>
+              <span>৳{note.analysis.totalExpenses || 0}</span>
             </div>
             <ProgressBar
               value={note.analysis.totalExpenses}

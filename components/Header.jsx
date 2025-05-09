@@ -1,16 +1,27 @@
-import { NotebookText, Sun } from "lucide-react";
+import { NotebookPen, SquarePlus } from "lucide-react";
 
-export default function Header() {
+export default function Header({ setIsModalOpen }) {
   return (
-    <header className="bg-primary text-white p-4 shadow-md">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="flex items-center space-x-2">
-          <NotebookText className="h-8 w-8" />
-          <h1 className="text-2xl font-bold">AI Notepad</h1>
+    <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex justify-between items-center">
+          {/* Logo/Brand */}
+          <div className="flex items-center space-x-3 group">
+            <NotebookPen className="h-7 w-7 text-purple-200 group-hover:rotate-12 transition-transform" />
+            <h1 className="text-2xl font-bold tracking-tight">SmartSpend AI</h1>
+          </div>
+
+          {/* Theme Toggle */}
+          <button
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            aria-label="Add note"
+            onClick={() => {
+              setIsModalOpen(true); // Fixed this line - was x(true)
+            }}
+          >
+            <SquarePlus className="h-6 w-6 text-amber-200 hover:rotate-45 transition-transform" />
+          </button>
         </div>
-        <button className="p-2 rounded-full hover:bg-purple-800">
-          <Sun className="h-6 w-6" />
-        </button>
       </div>
     </header>
   );

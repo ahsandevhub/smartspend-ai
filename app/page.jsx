@@ -31,15 +31,32 @@ export default function Home() {
     }
   }, [notes, isClient]);
 
-  const addNote = (text) => {
+  const addNote = async (text) => {
     const newNote = {
       id: crypto.randomUUID(),
       text,
       createdAt: new Date().toISOString(),
     };
-    setNotes([newNote, ...notes]);
-    analyzeNote(newNote);
+
+    // Add note optimistically
+    setNotes((prevNotes) => [newNote, ...prevNotes]);
     setIsModalOpen(false);
+    setIsAnalyzing(true);
+
+    // Set the new note as selected before analyzing
+    setSelectedNote(newNote);
+
+    try {
+      // Analyze the note immediately after adding
+      await analyzeNote(newNote);
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      // Optionally show error to user
+    } finally {
+      setIsAnalyzing(false);
+    }
+
+    return newNote;
   };
 
   const editNote = (id, newText) => {
@@ -53,6 +70,8 @@ export default function Home() {
   };
 
   const analyzeNote = async (note) => {
+    if (!note.text.trim()) return; // Skip empty notes
+
     setIsAnalyzing(true);
     try {
       const prompt = `
@@ -97,15 +116,23 @@ export default function Home() {
 
       const { analysis } = await response.json();
 
-      setSelectedNote({
-        ...note,
-        analysis,
-      });
+      // Create updated note with analysis
+      const updatedNote = { ...note, analysis };
 
-      setNotes(notes.map((n) => (n.id === note.id ? { ...n, analysis } : n)));
+      // Always set the selected note
+      setSelectedNote(updatedNote);
+
+      // Update notes list
+      setNotes((prevNotes) =>
+        prevNotes.map((n) => (n.id === note.id ? updatedNote : n))
+      );
+
+      return analysis;
     } catch (error) {
-      alert("Failed to analyze note");
       console.error("Analysis error:", error);
+      // Even if analysis fails, keep the note selected
+      setSelectedNote(note);
+      throw error;
     } finally {
       setIsAnalyzing(false);
     }
@@ -129,7 +156,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header />
+      <Header setIsModalOpen={setIsModalOpen} />
 
       <main className="flex-grow container mx-auto px-4 md:px-6 py-6 max-w-7xl">
         {notes.length === 0 ? (
@@ -178,135 +205,256 @@ export default function Home() {
       {/* Analysis Modal */}
       <AnimatePresence>
         {selectedNote && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <>
+            {/* Backdrop - unchanged */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
-            >
-              <div className="p-6 overflow-y-auto flex-grow">
-                <div className="flex justify-between items-start mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">
-                    Financial Analysis
-                  </h3>
-                  <button
-                    onClick={() => setSelectedNote(null)}
-                    className="text-gray-400 hover:text-gray-500 rounded-full p-1 hover:bg-gray-100"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40"
+              onClick={() => setSelectedNote(null)}
+            />
 
-                <div className="space-y-8">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-lg mb-3 text-gray-700">
-                      Original Note
-                    </h4>
-                    <p className="text-gray-600 whitespace-pre-wrap">
-                      {selectedNote.text}
+            {/* Modal */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.98 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:w-[95vw] sm:max-w-6xl sm:h-[90vh] h-screen bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            >
+              {/* Header - unchanged */}
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-5 text-white">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h2 className="text-2xl font-bold">Financial Insights</h2>
+                    <p className="text-indigo-100 text-sm mt-1">
+                      Analysis of your transaction
                     </p>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-red-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500">Total Expenses</p>
-                      <p className="text-2xl font-bold text-red-600">
-                        ${selectedNote.analysis?.totalExpenses || 0}
-                      </p>
-                    </div>
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500">Total Income</p>
-                      <p className="text-2xl font-bold text-green-600">
-                        ${selectedNote.analysis?.totalEarnings || 0}
-                      </p>
-                    </div>
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-500">Net Savings</p>
-                      <p className="text-2xl font-bold text-blue-600">
-                        ${selectedNote.analysis?.netSavings || 0}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <h4 className="font-semibold text-lg mb-4 text-gray-700">
-                        Expense Breakdown
-                      </h4>
-                      <div className="h-64">
-                        <ExpenseChart
-                          categories={
-                            selectedNote.analysis?.expenseCategories || {}
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <h4 className="font-semibold text-lg mb-4 text-gray-700">
-                        Income Sources
-                      </h4>
-                      <div className="h-64">
-                        <IncomeChart
-                          sources={selectedNote.analysis?.incomeSources || {}}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {selectedNote.analysis?.trends && (
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <h4 className="font-semibold text-lg mb-3 text-gray-700">
-                        Financial Trends
-                      </h4>
-                      <ul className="space-y-3">
-                        {selectedNote.analysis.trends.map((trend, index) => (
-                          <li
-                            key={index}
-                            className="flex items-start gap-3 text-gray-700"
-                          >
-                            <span
-                              className={`inline-flex items-center justify-center w-5 h-5 rounded-full mt-0.5 flex-shrink-0 ${
-                                trend.toLowerCase().includes("income")
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }`}
-                            >
-                              {trend.toLowerCase().includes("income")
-                                ? "↑"
-                                : "↓"}
-                            </span>
-                            <span>{trend}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {selectedNote.analysis?.advice && (
-                    <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-400">
-                      <h4 className="font-semibold text-lg mb-2 text-gray-700">
-                        Financial Advice
-                      </h4>
-                      <p className="text-gray-700">
-                        {selectedNote.analysis.advice}
-                      </p>
-                    </div>
-                  )}
+                  <button
+                    onClick={() => setSelectedNote(null)}
+                    className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
 
-              <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
+              {/* Content */}
+              <div className="flex-1 overflow-y-auto sm:p-6 p-4">
+                {/* Original Note Card - always visible */}
+                <div className="bg-gray-50 rounded-xl p-5 mb-6 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
+                    <h3 className="font-medium text-gray-800">
+                      Original Transaction
+                    </h3>
+                  </div>
+                  <p className="text-gray-600 whitespace-pre-wrap bg-white p-4 rounded-lg">
+                    {selectedNote.text}
+                  </p>
+                </div>
+
+                {isAnalyzing ? (
+                  // Loading Skeleton UI
+                  <div className="space-y-8">
+                    {/* Financial Summary Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[...Array(3)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="p-5 rounded-xl border border-gray-200"
+                        >
+                          <div className="h-4 w-1/3 bg-gray-200 rounded mb-2 animate-pulse"></div>
+                          <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Charts Skeleton */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {[...Array(2)].map((_, i) => (
+                        <div
+                          key={i}
+                          className="p-5 rounded-xl border border-gray-200"
+                        >
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                            <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
+                          </div>
+                          <div className="h-64 bg-gray-100 rounded-lg animate-pulse"></div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Trends & Advice Skeleton */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="p-5 rounded-xl border border-gray-200">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                          <div className="h-4 w-1/4 bg-gray-200 rounded animate-pulse"></div>
+                        </div>
+                        <div className="space-y-3">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i} className="flex items-start gap-3">
+                              <div className="w-6 h-6 rounded-full bg-gray-200 mt-0.5"></div>
+                              <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="p-5 rounded-xl border border-gray-200 bg-gray-100">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-3 h-3 rounded-full bg-gray-400"></div>
+                          <div className="h-4 w-1/4 bg-gray-300 rounded animate-pulse"></div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="h-4 w-full bg-gray-300 rounded animate-pulse"></div>
+                          <div className="h-4 w-5/6 bg-gray-300 rounded animate-pulse"></div>
+                          <div className="h-4 w-2/3 bg-gray-300 rounded animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  // Actual Content when not loading
+                  <>
+                    {/* Financial Summary */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                      <div className="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-xl border border-green-100">
+                        <p className="text-sm text-green-600 mb-1">
+                          Total Income
+                        </p>
+                        <p className="text-3xl font-bold text-green-700">
+                          ৳
+                          {selectedNote.analysis?.totalEarnings?.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                      <div className="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-xl border border-red-100">
+                        <p className="text-sm text-red-600 mb-1">
+                          Total Expenses
+                        </p>
+                        <p className="text-3xl font-bold text-red-700">
+                          ৳
+                          {selectedNote.analysis?.totalExpenses?.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                      <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-xl border border-blue-100">
+                        <p className="text-sm text-blue-600 mb-1">
+                          Current Balance
+                        </p>
+                        <p className="text-3xl font-bold text-blue-700">
+                          ৳
+                          {selectedNote.analysis?.netSavings?.toLocaleString() ||
+                            0}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Charts Row */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                          <h3 className="font-medium text-gray-800">
+                            Income Sources
+                          </h3>
+                        </div>
+                        <div className="h-64 flex items-center justify-center">
+                          <IncomeChart
+                            sources={selectedNote.analysis?.incomeSources || {}}
+                          />
+                        </div>
+                      </div>
+                      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                          <h3 className="font-medium text-gray-800">
+                            Expense Breakdown
+                          </h3>
+                        </div>
+                        <div className="h-64 flex items-center justify-center">
+                          <ExpenseChart
+                            categories={
+                              selectedNote.analysis?.expenseCategories || {}
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Trends & Advice */}
+                    {selectedNote.analysis && (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {selectedNote.analysis.trends && (
+                          <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+                              <h3 className="font-medium text-gray-800">
+                                Key Trends
+                              </h3>
+                            </div>
+                            <ul className="space-y-3">
+                              {selectedNote.analysis.trends.map(
+                                (trend, index) => (
+                                  <li
+                                    key={index}
+                                    className="flex items-start gap-3"
+                                  >
+                                    <span
+                                      className={`inline-flex items-center justify-center w-6 h-6 rounded-full mt-0.5 flex-shrink-0 ${
+                                        trend.toLowerCase().includes("income")
+                                          ? "bg-green-100 text-green-800"
+                                          : "bg-red-100 text-red-800"
+                                      }`}
+                                    >
+                                      {trend.toLowerCase().includes("income")
+                                        ? "↑"
+                                        : "↓"}
+                                    </span>
+                                    <p className="text-gray-700">{trend}</p>
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        )}
+
+                        {selectedNote.analysis.advice && (
+                          <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-xl border border-amber-200">
+                            <div className="flex items-center gap-2 mb-4">
+                              <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+                              <h3 className="font-medium text-gray-800">
+                                Smart Advice
+                              </h3>
+                            </div>
+                            <div className="prose prose-sm text-gray-700">
+                              {selectedNote.analysis.advice}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Footer - unchanged */}
+              <div className="border-t border-gray-200 p-4 bg-gray-50 flex justify-end">
                 <button
-                  onClick={() => setSelectedNote(null)}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none"
+                  onClick={() => {
+                    setSelectedNote(null);
+                  }}
+                  className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors shadow-sm"
                 >
-                  Close
+                  Done
                 </button>
               </div>
             </motion.div>
-          </div>
+          </>
         )}
       </AnimatePresence>
 
@@ -314,8 +462,10 @@ export default function Home() {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-6 right-6 bg-indigo-600 hover:bg-indigo-700 text-white p-4 rounded-full shadow-lg z-40 transition-colors flex items-center justify-center"
+        onClick={() => {
+          setIsModalOpen(true); // Fixed this line - was x(true)
+        }}
+        className="fixed bottom-6 right-6 bg-pink-600 hover:bg-pink-700 text-white p-4 rounded-full shadow-lg z-40 transition-colors flex items-center justify-center"
       >
         {isAnalyzing ? (
           <Loader2 className="h-6 w-6 animate-spin" />
@@ -327,7 +477,8 @@ export default function Home() {
       <AddNoteModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSave={addNote}
+        onSave={addNote} // Now handles analysis internally
+        isLoading={isAnalyzing}
       />
 
       <Footer />

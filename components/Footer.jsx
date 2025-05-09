@@ -1,17 +1,15 @@
-import { Github, Linkedin } from "lucide-react";
+import { Heart } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-primary text-white p-4 mt-auto">
-      <div className="container mx-auto flex justify-between items-center">
-        <p>© 2023 AI Notepad</p>
-        <div className="flex space-x-4">
-          <a href="#" className="hover:text-accent">
-            <Github className="h-6 w-6" />
-          </a>
-          <a href="#" className="hover:text-accent">
-            <Linkedin className="h-6 w-6" />
-          </a>
+    <footer className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-center space-x-2">
+          <p className="text-sm flex items-center">
+            Developed with{" "}
+            <Heart className="h-4 w-4 mx-1 text-pink-300 fill-pink-300" /> by
+            Sadia Afrin
+          </p>
         </div>
       </div>
     </footer>
