@@ -2,7 +2,7 @@ import { NotebookPen, SquarePlus } from "lucide-react";
 
 export default function Header({ setIsModalOpen }) {
   return (
-    <header className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
       <div className="container mx-auto px-4 py-3">
         <div className="flex justify-between items-center">
           {/* Logo/Brand */}

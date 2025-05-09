@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowDownCircle,
   ArrowUpCircle,
+  BarChart2,
   CheckCircle,
   Clock,
   Loader2,
@@ -167,10 +168,44 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-[linear-gradient(to_right,#f0f0f0_1px,transparent_1px),linear-gradient(to_bottom,#f0f0f0_1px,transparent_1px)] bg-[size:24px_24px] bg-gray-50">
       <Header setIsModalOpen={setIsModalOpen} />
 
-      <main className="flex-grow container mx-auto px-3 md:px-6 py-5 max-w-7xl">
+      <main className="relative flex-grow container mx-auto px-3 md:px-6 py-5 max-w-7xl">
+        {isAnalyzing && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center">
+            <div className="text-center p-8 bg-white rounded-xl shadow-2xl max-w-md w-full mx-4">
+              <div className="flex justify-center mb-6">
+                <div className="relative h-16 w-16">
+                  {/* Animated circles */}
+                  <div className="absolute inset-0 border-4 border-indigo-200 rounded-full animate-ping opacity-75"></div>
+                  <div className="absolute inset-2 border-4 border-indigo-500 rounded-full animate-spin border-t-transparent"></div>
+                  <BarChart2 className="absolute inset-3 h-10 w-10 text-indigo-600 animate-pulse" />
+                </div>
+              </div>
+
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                Analyzing Your Transaction
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Crunching numbers and finding insights...
+              </p>
+
+              {/* Animated progress bar */}
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+                <div
+                  className="bg-gradient-to-r from-indigo-500 to-purple-600 h-2.5 rounded-full animate-pulse"
+                  style={{ width: "70%" }} // You can make this dynamic if you have progress
+                ></div>
+              </div>
+
+              <p className="text-sm text-gray-500">
+                This usually takes 2-5 seconds
+              </p>
+            </div>
+          </div>
+        )}
+
         {notes.length === 0 ? (
           <div className="text-center py-12 md:py-20">
             <div className="mx-auto w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
@@ -234,7 +269,7 @@ export default function Home() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:w-[95vw] sm:max-w-6xl sm:h-[90vh] h-screen bg-white sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+              className="fixed inset-0 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 w-full sm:w-[95vw] sm:max-w-6xl sm:h-[90vh] h-screen bg-purple-600/20 backdrop-blur-sm sm:rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             >
               {/* Header - unchanged */}
               <div className="bg-gradient-to-r from-indigo-600 to-purple-600 md:p-5 px-5 py-3 text-white">
@@ -496,7 +531,7 @@ export default function Home() {
               </div>
 
               {/* Footer - Redesigned */}
-              <div className="border-t border-gray-200/50 p-4 bg-gradient-to-r from-white via-gray-50 to-white">
+              <div className="border-t border-gray-200/50 p-4 bg-gradient-to-r from-purple-50 via-gray-50 to-white">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-1 text-sm text-gray-500">
                     <Clock className="h-4 w-4 text-indigo-400" />
